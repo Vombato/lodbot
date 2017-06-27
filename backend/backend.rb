@@ -1,33 +1,39 @@
-require "sinatra"
-require "sinatra/namespace"
+require 'sinatra'
+require 'sinatra/namespace'
+require 'sinatra/cross_origin'
 require 'json'
+require 'jwt'
 
-namespace "/api" do
-	namespace "/v1" do
-			post "/login" do
-				content_type :json
-				payload = JSON.parse(request.body.read)
-				res = {}
+namespace '/api' do
+    namespace '/v1' do
+        post '/login' do
+            content_type :json
+            cross_origin :allow_origin => '*'
+            payload = JSON.parse(request.body.read)
 
-				if payload.key? "username"
-					res[:username] = payload["username"]
-				else
-					status = "username missing"
-				end
+            puts 'Received ' + payload.to_s
 
-				if payload.key? "password"
-					res[:password] = payload["password"]
-				else
-					status = "password missing"
-				end
+            hmac_secret = 'secret'
 
-				res[:status] = status
+            if payload.key?('username') && payload.key?('password')
+                token = JWT.encode payload, hmac_secret, 'HS256'
+            end
 
-				res.to_json
-			end
-	end
+            res = { 'jwt' => token }
+
+            res.to_json
+        end
+
+        options '*' do
+            response.headers['Allow'] = 'HEAD,GET,PUT,POST,DELETE,OPTIONS'
+
+            response.headers['Access-Control-Allow-Headers'] = 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Cache-Control, Accept'
+
+            200
+        end
+    end
 end
 
-get "/" do
-	send_file "public/index.html"
+get '/' do
+    send_file 'public/index.html'
 end

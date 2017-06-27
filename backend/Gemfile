@@ -5,5 +5,6 @@ sinatra_version = "2.0.0"
 
 gem "sinatra", sinatra_version
 gem "sinatra-contrib", sinatra_version
+gem "sinatra-cross_origin"
 gem "jwt", "1.5.6"
 gem "json", "2.1.0"

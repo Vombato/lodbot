@@ -6,7 +6,7 @@ namespace :web do
         sh "cp -r ../frontend/build/* ./public/"
     end
 
-    task :start do
+    task :run do
         ruby "backend.rb"
     end
 
